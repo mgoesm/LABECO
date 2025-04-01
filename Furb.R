@@ -4,24 +4,24 @@ A <- 1+1
 
 #PACOTE tidyverse
 
-install.packages("tidyverse")
-library(tidyverse)
+#install.packages("tidyverse")
+#library(tidyverse)
 
 # WDI - WORLD DEVOLEPMENT INDICATORS
 #install.packages("WDI")
-library(WDI)
+#library(WDI)
 
 # vignettes = paginas com instrucoes dos pacotes
 
-WDIsearch('gdp')
-library(remotes)
+#WDIsearch('gdp')
+#library(remotes)
 install_github('vincentarelbundock/WDI')
 # GDP (current US$)(NY.GDP.MKTP.CD)
 # Código: NY.GDP.MKTP.CD
 varpib <- WDIsearch("gdp")
 
 # REMOVER A NOT. CIENT.
-options(scipen = 999)
+#options(scipen = 999)
 
 # DADOS EM PAINEL
 dadospib <- WDI(country = 'all', indicator = 'NY.GDP.MKTP.CD')
@@ -31,5 +31,49 @@ dadospib2023 <- WDI(country = 'all', indicator = 'NY.GDP.MKTP.CD', start = 2023,
 
 # SÉRIE TEMPORAL
 dadospibbr <- WDI(country = 'BR',
-                  indicator = 'NY.GDP.MKTP.CD')                
-                
+                  indicator = 'NY.GDP.MKTP.CD')             
+
+#ATIVIDADE  
+
+# DADOS EM PAINEL
+LuzAll <- WDI(country = 'all', indicator = 'EG.ELC.ACCS.ZS')
+
+# CORTE TRANSVERSAL
+LuzArg90 <- WDI(country = 'AR', indicator = 'EG.ELC.ACCS.ZS', start = 1990, end = 2000)
+
+# SÉRIE TEMPORAL
+LuzArg <- WDI(country = 'AR',
+                  indicator = 'EG.ELC.ACCS.ZS') 
+
+# GRÁFICOS
+# BIBLIOTECA ggplot2 (tidyverse)
+
+#Grafico Painel
+grafpainel <- ggplot(dadospib, mapping = aes(y=NY.GDP.MKTP.CD,x= year)) + geom_point()
+
+print(grafpainel)
+
+#Grafico em Corte Transversal
+
+grafcorte <- ggplot(dadospib2023, mapping = aes(y=NY.GDP.MKTP.CD, x= year)) + geom_point()
+
+print(grafcorte)
+
+#Grafico Serie Temporal
+
+grafserie <- ggplot(dadospibbr, aes(x = year, y = NY.GDP.MKTP.CD)) +
+  geom_line()
+
+print(grafserie)
+
+# ATIVIDADE 2
+
+grafpainel.2 <- ggplot(LuzAll, mapping = aes(y=EG.ELC.ACCS.ZS,x= year)) + geom_point()
+print(grafpainel.2)
+
+grafcorte.2 <- ggplot(LuzArg90, mapping = aes(y=EG.ELC.ACCS.ZS, x= year)) + geom_point()
+print(grafcorte.2)
+
+grafserie.2 <- ggplot(LuzArg, aes(x = year, y = EG.ELC.ACCS.ZS)) +
+  geom_line()
+print(grafserie.2)
