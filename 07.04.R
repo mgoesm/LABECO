@@ -118,19 +118,23 @@ print(grafcorte.2)
 
 SERIE TEMPORAL
 
-# Filtrar os países desejados
-dados_temporal <- LuzAll %>%
-  filter(country %in% c("Brazil", "Argentina", "United States", "China", "South Africa"))
+library(dplyr)
+library(ggplot2)
 
-# Criar gráfico de linhas
+# Filtrar os países e o período a partir de 1990
+dados_temporal <- LuzAll %>%
+  filter(country %in% c("Brazil", "Argentina", "United States", "China", "South Africa"),
+         year >= 1990)
+
+# Criar gráfico
 grafserie.2 <- ggplot(dados_temporal, aes(x = year, y = EG.ELC.ACCS.ZS, color = country)) +
   geom_line(size = 1.2) +
   labs(title = "Acesso à Eletricidade (% da População)",
-       subtitle = "Evolução ao longo do tempo",
+       subtitle = "De 1990 a 2023",
        x = "Ano",
        y = "% da População com Acesso",
        color = "País") +
   theme_minimal()
 
-# Exibir gráfico
 print(grafserie.2)
+
