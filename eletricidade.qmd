@@ -1,0 +1,98 @@
+---
+title: "Matheus Goes"
+format: html
+editor: visual
+---
+
+```{r}
+#| label: load-packages
+#| include: false
+
+library(dplyr)
+library(ggplot2)
+library(WDI)
+
+options(scipen = 999) # Evita notação científica
+
+# Importar dados
+LuzAll <- WDI(country = c("BR", "AR", "US", "CN", "ZA"),
+              indicator = "EG.ELC.ACCS.ZS",
+              start = 1960,
+              end = 2023)
+```
+
+## VARIÁVEL
+
+A variável utilizada é **"EG.ELC.ACCS.ZS"**, que representa o **acesso à eletricidade (% da população)**.\
+Fonte: Banco Mundial (World Bank - WDI).\
+A medida está em **percentual (%)** e indica a parcela da população com acesso à eletricidade em cada país e ano.
+
+------------------------------------------------------------------------
+
+## GRÁFICO DE DADOS EM PAINEL
+
+Abaixo temos a evolução do acesso à eletricidade na **Argentina** ao longo dos anos.
+
+```{r}
+#| label: grafico-painel
+#| warning: false
+#| echo: false
+
+dados_arg <- LuzAll %>% filter(iso2c == "AR")
+
+ggplot(dados_arg, aes(x = year, y = EG.ELC.ACCS.ZS)) +
+  geom_line(color = "blue", size = 1.2) +
+  labs(title = "Acesso à Eletricidade na Argentina",
+       x = "Ano",
+       y = "% da População com Acesso") +
+  theme_minimal()
+```
+
+------------------------------------------------------------------------
+
+## GRÁFICO DE DADOS DE CORTE TRANSVERSAL
+
+O gráfico abaixo compara o acesso à eletricidade em **diferentes países no ano de 2005**.
+
+```{r}
+#| label: grafico-corte
+#| warning: false
+#| echo: false
+
+dados_corte <- LuzAll %>%
+  filter(year == 2005,
+         country %in% c("Brazil", "Argentina", "United States", "China", "South Africa"))
+
+ggplot(dados_corte, aes(x = reorder(country, EG.ELC.ACCS.ZS), y = EG.ELC.ACCS.ZS)) +
+  geom_col(fill = "steelblue") +
+  labs(title = "Acesso à Eletricidade em 2005",
+       x = "País",
+       y = "% da População com Acesso") +
+  coord_flip() +
+  theme_minimal()
+```
+
+------------------------------------------------------------------------
+
+## GRÁFICO DE DADOS DE SÉRIE TEMPORAL
+
+Neste gráfico comparamos a evolução do acesso à eletricidade entre os cinco países de 1990 a 2023.
+
+```{r}
+#| label: grafico-serie-temporal
+#| warning: false
+#| echo: false
+
+dados_temporal <- LuzAll %>%
+  filter(country %in% c("Brazil", "Argentina", "United States", "China", "South Africa"),
+         year >= 1990)
+
+ggplot(dados_temporal, aes(x = year, y = EG.ELC.ACCS.ZS, color = country)) +
+  geom_line(size = 1.2) +
+  labs(title = "Acesso à Eletricidade (% da População)",
+       subtitle = "Evolução de 1990 a 2023",
+       x = "Ano",
+       y = "% da População com Acesso",
+       color = "País") +
+  theme_minimal()
+```
