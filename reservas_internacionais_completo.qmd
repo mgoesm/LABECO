@@ -1,0 +1,94 @@
+---
+title: "Matheus Goes"
+format: html
+editor: visual
+---
+
+```{r}
+#| label: load-packages
+#| include: false
+
+library(GetBCBData)
+library(dplyr)
+library(ggplot2)
+library(gganimate)
+```
+
+## VARIÁVEL
+
+Neste trabalho escolhemos analisar a variável **Reservas Internacionais do Brasil**.\
+Essa variável representa os ativos em moeda estrangeira (como dólares, euros, ouro) mantidos pelo Banco Central, usados para proteger a economia contra choques externos, garantir a capacidade de pagamento internacional e dar segurança aos investidores.\
+A fonte dos dados é o Banco Central do Brasil, código 13621.\
+Os dados foram convertidos para **US\$ bilhões** para facilitar a visualização.
+
+Em dezembro de 2024, a alocação por moedas das reservas se dava da seguinte forma:\
+- 78,45% em dólar norte-americano (USD)\
+- 5,31% em renminbi (CNY)\
+- 5,23% em euro (EUR)\
+- 3,69% em libra esterlina (GBP)\
+- 3,55% em ouro\
+- 1,73% em iene (JPY)\
+- 1,05% em dólar canadense (CAD)\
+- 0,99% em dólar australiano (AUD)
+
+## COMENTÁRIOS SOBRE O GRÁFICO
+
+O gráfico abaixo mostra a evolução histórica das reservas internacionais do Brasil desde o ano 2000.\
+A animação destaca como as reservas foram crescendo ao longo do tempo, especialmente entre 2006 e 2014, e os ajustes após 2015.
+
+**Principais movimentos identificados:**\
+- 2000–2005: Reservas modestas, vulnerabilidade externa.\
+- 2006–2014: Forte acumulação por alta das commodities e entrada de dólares.\
+- Após 2015: Estabilização e leve queda, com uso parcial das reservas para conter volatilidade.
+
+Ter reservas elevadas permite ao país manter a confiança dos investidores, defender a moeda local e melhorar a classificação de risco internacional. Por outro lado, manter reservas tem custo, pois os dólares parados rendem pouco e poderiam ser investidos em áreas produtivas.
+
+## GRÁFICO ANIMADO
+
+```{r}
+#| label: graficoanimado
+#| warning: false
+#| message: false
+#| echo: false
+
+# Buscar dados
+my.id <- c(reservas = 13621)
+
+df.bcb <- gbcbd_get_series(
+  id = my.id,
+  first.date = '2000-01-01',
+  last.date = Sys.Date(),
+  format.data = 'long',
+  use.memoise = TRUE,
+  cache.path = tempdir(),
+  do.parallel = FALSE
+)
+
+# Preparar dados em bilhões
+df.bcb <- df.bcb %>%
+  select(ref.date, value) %>%
+  mutate(value_bilhoes = value / 1000) %>%
+  arrange(ref.date)
+
+# Criar gráfico animado
+anim <- ggplot(df.bcb, aes(x = ref.date, y = value_bilhoes)) +
+  geom_line(color = "#FFD700", size = 1.5) +
+  labs(title = "Reservas Internacionais do Brasil",
+       subtitle = 'Ano: {frame_time}',
+       x = 'Ano', y = 'US$ bilhões') +
+  theme_minimal(base_family = "Helvetica") +
+  theme(
+    plot.background = element_rect(fill = "black", color = NA),
+    panel.background = element_rect(fill = "black", color = NA),
+    plot.title = element_text(face = "bold", size = 18, color = "white"),
+    plot.subtitle = element_text(size = 14, color = "white", margin = margin(b = 10)),
+    axis.title = element_text(color = "white"),
+    axis.text = element_text(color = "white"),
+    legend.position = "none"
+  ) +
+  transition_reveal(ref.date)
+
+anim
+```
+
+![](reservas_animado.gif)
